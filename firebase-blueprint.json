@@ -1,0 +1,235 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access information",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the user"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the user"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address of the user"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["PATIENT", "DOCTOR", "HOSPITAL_ADMIN", "SYSTEM_ADMIN"],
+          "description": "Healthcare role assigned to the user"
+        },
+        "hospitalId": {
+          "type": "string",
+          "description": "Associated hospital facility ID"
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Associated patient profile ID if patient"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when account was created"
+        }
+      },
+      "required": ["id", "name", "email", "role"]
+    },
+    "Patient": {
+      "title": "Patient",
+      "description": "Longitudinal patient clinical record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique patient ID e.g. PAT-1001"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Patient legal full name"
+        },
+        "age": {
+          "type": "number",
+          "description": "Patient age in years"
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["Male", "Female", "Other"],
+          "description": "Gender of the patient"
+        },
+        "bloodGroup": {
+          "type": "string",
+          "description": "Blood group and Rh factor"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact telephone number"
+        },
+        "email": {
+          "type": "string",
+          "description": "Contact email address"
+        },
+        "hospitalId": {
+          "type": "string",
+          "description": "Hospital facility ID"
+        },
+        "primaryDoctorId": {
+          "type": "string",
+          "description": "Primary attending physician ID"
+        }
+      },
+      "required": ["id", "fullName", "hospitalId"]
+    },
+    "MedicalDocument": {
+      "title": "MedicalDocument",
+      "description": "Clinical document or report",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Document identifier"
+        },
+        "patientId": {
+          "type": "string",
+          "description": "ID of the patient this document belongs to"
+        },
+        "title": {
+          "type": "string",
+          "description": "Document title or description"
+        },
+        "type": {
+          "type": "string",
+          "description": "Document classification"
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Date uploaded"
+        },
+        "doctorVerificationStatus": {
+          "type": "string",
+          "enum": ["VERIFIED", "PENDING_VERIFICATION", "REJECTED"],
+          "description": "Verification status by clinician"
+        }
+      },
+      "required": ["id", "patientId", "title"]
+    },
+    "TimelineEvent": {
+      "title": "TimelineEvent",
+      "description": "Longitudinal clinical encounter, lab result, prescription or clinical event",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique event identifier"
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Target patient ID"
+        },
+        "date": {
+          "type": "string",
+          "description": "ISO date string of encounter"
+        },
+        "category": {
+          "type": "string",
+          "description": "Consultation, Lab Result, Imaging, Prescription, Hospitalization"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the clinical event"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Clinical summary of encounter or findings"
+        }
+      },
+      "required": ["id", "patientId", "date", "category", "title"]
+    },
+    "ConsentRecord": {
+      "title": "ConsentRecord",
+      "description": "Patient authorization and data sharing consent record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique consent record identifier"
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Consenting patient ID"
+        },
+        "doctorOrHospitalId": {
+          "type": "string",
+          "description": "Authorized entity ID"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ACTIVE", "REVOKED", "EXPIRED"],
+          "description": "Consent lifecycle state"
+        },
+        "grantedDate": {
+          "type": "string",
+          "description": "Date consent was granted"
+        }
+      },
+      "required": ["id", "patientId", "doctorOrHospitalId", "status"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable security and audit entry",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique audit log ID"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "ISO timestamp of event"
+        },
+        "userId": {
+          "type": "string",
+          "description": "User who performed the action"
+        },
+        "action": {
+          "type": "string",
+          "description": "Description of action"
+        },
+        "patientId": {
+          "type": "string",
+          "description": "Target patient ID if applicable"
+        }
+      },
+      "required": ["id", "timestamp", "action"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles with role assignment"
+    },
+    "/patients/{patientId}": {
+      "schema": "Patient",
+      "description": "Longitudinal patient clinical records"
+    },
+    "/documents/{documentId}": {
+      "schema": "MedicalDocument",
+      "description": "Medical documents and clinical reports"
+    },
+    "/timelineEvents/{eventId}": {
+      "schema": "TimelineEvent",
+      "description": "Longitudinal clinical encounters and lab records"
+    },
+    "/consents/{consentId}": {
+      "schema": "ConsentRecord",
+      "description": "Patient access consents and authorizations"
+    },
+    "/auditLogs/{logId}": {
+      "schema": "AuditLog",
+      "description": "Access and event audit logs"
+    }
+  }
+}
